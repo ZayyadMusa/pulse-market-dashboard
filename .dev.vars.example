@@ -1,0 +1,19 @@
+# Server runtime only. Never put these values in browser code.
+BETTER_AUTH_URL=https://your-pulse-domain.example
+BETTER_AUTH_SECRET=replace-with-a-cryptographically-random-secret-of-at-least-32-characters
+
+# Optional one-click Google sign-in. Both values are required.
+# Callback: https://your-pulse-domain.example/api/auth/callback/google
+GOOGLE_CLIENT_ID=
+GOOGLE_CLIENT_SECRET=
+
+# Optional verified email delivery. Both values are required to enable
+# confirmation emails, required email verification, and password reset.
+RESEND_API_KEY=
+AUTH_EMAIL_FROM=
+
+# Optional owner diagnostics. A verified customer account is required.
+PULSE_ADMIN_EMAILS=
+
+# Optional CoinGecko Demo adapter. Keyless quotes use CoinLore.
+COINGECKO_DEMO_API_KEY=

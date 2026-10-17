@@ -1,0 +1,20 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "types": [
+      "node"
+    ],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
+    "incremental": false
+  },
+  "include": [
+    "interactions.test.tsx"
+  ],
+  "exclude": [
+    "../node_modules"
+  ]
+}

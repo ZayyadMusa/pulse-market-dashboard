@@ -1,0 +1,20 @@
+export type Coin = {
+  id: string; symbol: string; name: string; market_cap_rank: number; source?:'CoinGecko'|'CoinLore'; provider_id?:string;
+  current_price: number | null; market_cap: number | null; total_volume: number | null;
+  high_24h: number | null; low_24h: number | null; circulating_supply: number | null;
+  total_supply: number | null; max_supply: number | null; ath: number | null;
+  price_change_percentage_24h: number | null;
+  price_change_percentage_1h_in_currency?: number | null;
+  price_change_percentage_24h_in_currency?: number | null;
+  price_change_percentage_7d_in_currency?: number | null;
+  sparkline_in_7d?: {price: number[]}; last_updated: string;
+};
+export type FxRate = {date:string; base:string; quote:string; rate:number};
+export type FxData = {base:'USD'; rates:Record<string,number>; dates:Record<string,string>; source:'Frankfurter'};
+export type CacheMeta = {key:string; cache:'HIT'|'MISS'|'STALE'; fetchedAt:string; expiresAt:string; ageSeconds:number; warning?:string};
+export type Envelope<T> = {data:T; meta:CacheMeta};
+export type ChartData = {prices:[number,number][];source?:'CoinGecko'|'CoinLore';granularity?:'daily'|'intraday';dailyRange?:{low:number;high:number;date:string};ath?:number|null};
+export type Period = '1'|'7'|'30'|'365';
+export type User = {displayName:string; email?:string}|null;
+export type View = 'markets'|'coin'|'converter'|'watchlist'|'signin'|'status';
+export type StatusData = {month:string; monthlyUsed:number; monthlyLimit:number; minuteLimit:number; metrics:Record<string,number>; resources:{key:string;fetchedAt:number;expiresAt:number}[]; keyConfigured:boolean};

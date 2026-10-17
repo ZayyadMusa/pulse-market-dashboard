@@ -1,0 +1,5 @@
+import {clientAssets} from './client-assets';
+import {seedJSON} from './client-seed';
+import type {DashboardProps} from '../components/dashboard';
+export function pulseDocument(snapshot:DashboardProps){return `<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#17191c"><title>Pulse — Crypto &amp; FX</title><meta name="description" content="Follow crypto prices, explore charts, convert currencies, and save your own watchlist."><link rel="icon" href="/favicon.svg"><link rel="preload" href="/fonts/jakarta.woff2" as="font" type="font/woff2" crossorigin><link rel="stylesheet" href="${clientAssets.css}"><script defer src="${clientAssets.boot}"></script></head><body><div id="pulse-root"><main class="app-loading"><img src="/favicon.svg" width="42" height="42" alt="Pulse"><h1>Opening your market desk…</h1><p>Loading prices and currency tools.</p></main></div><script type="application/json" id="pulse-data">${seedJSON(snapshot)}</script><noscript><p class="noscript-message">Enable JavaScript to use the market tools and converter.</p></noscript></body></html>`;}

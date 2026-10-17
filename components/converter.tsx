@@ -1,0 +1,25 @@
+'use client';
+import {useMemo,useState} from 'react';
+import {ArrowDownUp,ArrowRight,Globe2,Info} from 'lucide-react';
+import {convertAmount,priceText} from '@/lib/market-math';
+import type {Coin,FxData,Envelope} from '@/lib/types';
+const names=typeof Intl.DisplayNames==='function'?new Intl.DisplayNames(['en'],{type:'currency'}):null;
+export function currencyName(code:string){try{return names?.of(code)??code;}catch{return code;}}
+function initialCurrency(key:string,fallback:string){if(typeof window==='undefined')return fallback;const value=new URLSearchParams(window.location.search).get(key);return value&&/^(coin:[a-z0-9-]{1,80}|fiat:[A-Z]{3})$/.test(value)?value:fallback;}
+export function Converter({coins,fx}:{coins:Coin[];fx:Envelope<FxData>|null}){
+ const [from,setFrom]=useState(()=>initialCurrency('from','coin:bitcoin')),[to,setTo]=useState(()=>initialCurrency('to','fiat:NGN')),[amount,setAmount]=useState('1');
+ const rates=fx?.data.rates??{USD:1};const codes=Object.keys(rates).sort();
+ const options=useMemo(()=>[{id:'fiat:USD',name:'US Dollar',symbol:'USD',usd:1,coin:false},...coins.filter(c=>c.current_price!=null&&c.current_price>0).map(c=>({id:`coin:${c.id}`,name:c.name,symbol:c.symbol.toUpperCase(),usd:c.current_price!,coin:true})),...codes.filter(c=>c!=='USD').map(code=>({id:`fiat:${code}`,name:currencyName(code),symbol:code,usd:1/rates[code],coin:false}))],[coins,fx]);
+ const first=options.find(o=>o.id===from),last=options.find(o=>o.id===to);
+ const numeric=amount.trim()===''?NaN:Number(amount);const result=first&&last?convertAmount(numeric,first.usd,last.usd):null;
+ const format=(n:number,o:typeof first)=>!o?'—':o.coin?`${new Intl.NumberFormat('en-US',{maximumFractionDigits:8}).format(n)} ${o.symbol}`:priceText(n,o.symbol);
+ const rate=first&&last?convertAmount(1,first.usd,last.usd):null;
+ const selectedDates=[from,to].filter(v=>v.startsWith('fiat:')&&v!=='fiat:USD').map(v=>fx?.data.dates[v.slice(5)]).filter(Boolean) as string[];
+ const asOf=selectedDates.sort()[0];
+ const choose=(value:string,change:(v:string)=>void,label:string)=><label className="currency-picker"><span className="sr-only">{label}</span><select value={value} onChange={e=>change(e.target.value)}><optgroup label="Crypto">{options.filter(o=>o.coin).map(o=><option key={o.id} value={o.id}>{o.symbol} — {o.name}</option>)}</optgroup><optgroup label="Currencies">{options.filter(o=>!o.coin).map(o=><option key={o.id} value={o.id}>{o.symbol} — {o.name}</option>)}</optgroup></select></label>;
+ return <div className="converter-layout"><section className="panel conversion-panel"><div className="panel-heading"><div><h2>Currency converter</h2><p>Crypto to cash. Or the other way around.</p></div><span className="soft-icon"><ArrowDownUp size={19}/></span></div>
+ <div className="converter-fields"><div className="currency-field"><label htmlFor="convert-amount">You convert</label><div className="amount-row"><input id="convert-amount" type="number" min="0" step="any" inputMode="decimal" value={amount} onChange={e=>setAmount(e.target.value)} placeholder="0.00" aria-describedby="amount-error"/>{choose(from,setFrom,'Convert from')}</div><small>{first?.name??'Choose an available asset'}</small></div><div className="swap-line"><button className="swap-button" onClick={()=>{setFrom(to);setTo(from);if(result!==null)setAmount(String(Number(result.toPrecision(10))));}} aria-label="Swap conversion currencies"><ArrowDownUp size={17}/></button></div><div className="currency-field result-field"><span>You get</span><div className="amount-row"><output aria-live="polite">{result==null?'—':new Intl.NumberFormat('en-US',{maximumFractionDigits:last?.coin?8:2}).format(result)}</output>{choose(to,setTo,'Convert to')}</div><small>{last?.name??'Waiting for currency rates'}</small></div></div>
+ <p id="amount-error" className="input-error">{amount!==''&&(!Number.isFinite(numeric)||numeric<0)?'Enter an amount of zero or more.':!first||!last?'This pair needs data that is currently unavailable.':''}</p>
+ <div className="conversion-rate"><span className="status-dot"/> {rate!==null&&last?`1 ${first?.symbol} = ${format(rate,last)}`:'Waiting for rates'}</div><div className="conversion-notes"><Info size={15}/><span>Uses market prices and daily reference rates. Fees and exchange spreads are excluded.{asOf&&<> FX reference date: <strong>{asOf}</strong>.</>}{fx?.meta.cache==='STALE'&&<> Showing the last available FX rates.</>}</span></div>
+ </section><aside className="converter-aside"><div className="art-card"><img src="/art/market-wave.webp" alt="Original copper ribbon sculpture inspired by market waves"/><div><span className="art-caption">The bigger picture</span><h2>One market.<br/>Many currencies.</h2><p>See the value from your side of the world.</p></div></div><section className="panel reference-panel"><Globe2 size={21}/><h3>{codes.length} currencies</h3><p>Including the Nigerian naira, US dollar, British pound, euro, and Japanese yen.</p><a href="https://frankfurter.dev" target="_blank" rel="noreferrer">Reference rates by Frankfurter <ArrowRight size={14}/></a></section></aside></div>;
+}

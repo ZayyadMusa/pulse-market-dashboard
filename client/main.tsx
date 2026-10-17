@@ -1,0 +1,11 @@
+import {createRoot} from 'react-dom/client';
+import Dashboard from '../components/dashboard';
+import {pulseRoute} from '../lib/page-routes';
+import {clientSeed} from '../lib/client-seed';
+const root=document.getElementById('pulse-root');
+if(!root)throw new Error('Pulse root is missing.');
+const route=pulseRoute(window.location.pathname)??{view:'markets' as const};
+export const pulseRoot=createRoot(root);
+const seed=clientSeed(route,document.getElementById('pulse-data')?.textContent??null);
+pulseRoot.render(<Dashboard {...seed}/>);
+root.dataset.clientStarted='true';

@@ -1,0 +1,15 @@
+{
+  "framework": null,
+  "installCommand": "",
+  "buildCommand": "node scripts/build-vercel.mjs",
+  "outputDirectory": "dist",
+  "functions": {"api/router.js": {"maxDuration": 30}},
+  "rewrites": [
+    {"source": "/api/:path*", "destination": "/api/router?path=:path*"},
+    {"source": "/markets", "destination": "/index.html"},
+    {"source": "/converter", "destination": "/index.html"},
+    {"source": "/watchlist", "destination": "/index.html"},
+    {"source": "/signin", "destination": "/index.html"},
+    {"source": "/coin/:id", "destination": "/index.html"}
+  ]
+}
